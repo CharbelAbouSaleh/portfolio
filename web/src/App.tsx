@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+type Profile = {
+  name: string;
+  title: string;
+  location: string;
+};
+
+
+
+export default function App() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
+    fetch(`${API_BASE}/api/profile`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(setProfile)
+      .catch((e) => setError(String(e)));
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ fontFamily: "system-ui", padding: 24 }}>
+      <h1>Portfolio</h1>
 
-export default App
+      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+
+      {!profile && !error && <p>Loading...</p>}
+
+      {profile && (
+        <div>
+          <h2>{profile.name}</h2>
+          <p>{profile.title}</p>
+          <p>{profile.location}</p>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -5,7 +5,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Built-in OpenAPI document generation (.NET 10)
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevCors");
+}
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -38,6 +53,18 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+
+app.MapGet("/api/profile", () =>
+{
+    return Results.Ok(new
+    {
+        name = "Charbel Abou Saleh",
+        title = "Data Analyst / BI Developer",
+        location = "Lebanon"
+    });
+});
+
 
 app.Run();
 
