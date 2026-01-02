@@ -31,3 +31,5 @@ C:\Users\csaleh\portfolio\api\Portfolio.Api\obj\Debug\net10.0\refint\Portfolio.A
 C:\Users\csaleh\portfolio\api\Portfolio.Api\obj\Debug\net10.0\Portfolio.Api.pdb
 C:\Users\csaleh\portfolio\api\Portfolio.Api\obj\Debug\net10.0\Portfolio.Api.genruntimeconfig.cache
 C:\Users\csaleh\portfolio\api\Portfolio.Api\obj\Debug\net10.0\ref\Portfolio.Api.dll
+C:\Users\csaleh\portfolio\api\Portfolio.Api\obj\Debug\net10.0\Portfolio.Api.sourcelink.json
+C:\Users\csaleh\portfolio\api\Portfolio.Api\bin\Debug\net10.0\Scalar.AspNetCore.dll
