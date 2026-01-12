@@ -1,14 +1,35 @@
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Portfolio.Api.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+// -----------------------------For deploying APIs---------------------------------
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    // Render sets PORT. Binding 0.0.0.0 is required in container environments.
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+//----------------------------------------------------------------------------------
 
 // Built-in OpenAPI document generation (.NET 10)
 builder.Services.AddOpenApi();
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+var corsOrigins = builder.Configuration["CORS_ORIGINS"]
+                  ?? "http://localhost:5173";
+
+var origins = corsOrigins
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevCors", policy =>
-        policy.WithOrigins("http://localhost:5173")
+    options.AddPolicy("AppCors", policy =>
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
@@ -16,10 +37,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("DevCors");
-}
+app.UseCors("AppCors");
 
 
 if (app.Environment.IsDevelopment())
@@ -63,6 +81,16 @@ app.MapGet("/api/profile", () =>
         title = "Data Analyst / BI Developer",
         location = "Lebanon"
     });
+});
+
+
+app.MapGet("/api/projects", async (AppDbContext db) =>
+{
+    var projects = await db.Projects
+        .OrderByDescending(p => p.Id)
+        .ToListAsync();
+
+    return Results.Ok(projects);
 });
 
 
